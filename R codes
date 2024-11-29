@@ -1,0 +1,47 @@
+# Load necessary libraries
+library(readxl)
+library(dplyr)
+library(ggplot2)
+
+# Load the dataset
+file_path <- "C:\Users\USER\Desktop\Arel Int"  # Replace with the actual path
+data <- read_excel(file_path, sheet = "Original Data")
+
+# View the first few rows of the data
+head(data)
+
+# Summary of the data
+summary(data)
+
+# Check data structure
+str(data)
+
+# Analysis of categorical columns
+categorical_summary <- data %>%
+  summarise(across(where(is.character), ~length(unique(.)), .names = "unique_{col}"))
+
+# Analysis of numerical columns
+numerical_summary <- data %>%
+  summarise(across(where(is.numeric), list(mean = mean, sd = sd, median = median, na_count = ~sum(is.na(.))), na.rm = TRUE))
+
+# Visualization example: Gender distribution
+gender_plot <- ggplot(data, aes(x = `What is your gender?`)) +
+  geom_bar(fill = "steelblue") +
+  labs(title = "Gender Distribution", x = "Gender", y = "Count") +
+  theme_minimal()
+
+# Save the plot to a file
+ggsave("gender_distribution.png", plot = gender_plot)
+
+# Example of age analysis (e.g., age when entering Kenya)
+age_plot <- ggplot(data, aes(x = `How old were you when you entered Kenya?`)) +
+  geom_histogram(binwidth = 5, fill = "orange", color = "black") +
+  labs(title = "Age Distribution When Entering Kenya", x = "Age", y = "Frequency") +
+  theme_minimal()
+
+# Save the plot
+ggsave("age_distribution.png", plot = age_plot)
+
+# Display the summaries and visualizations
+print(categorical_summary)
+print(numerical_summary)
